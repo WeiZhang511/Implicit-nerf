@@ -7,7 +7,7 @@ import imageio
 import skimage
 from pytorch3d.utils.ico_sphere import ico_sphere
 import random
-from model.meshes import Meshes
+from model.Meshes import Meshes
 from dotty_dict import dotty
 from pytorch3d.renderer import look_at_view_transform, DirectionalLights
 from pytorch3d.renderer.cameras import PerspectiveCameras
@@ -227,9 +227,9 @@ def get_camera_parameters(camera, img_size, style='mvs', transpose=False):
 
 @torch.no_grad()
 def compile_video(mesh, filename, distance=3, render_mode='image_ct', ambient_net=None, **params):
-    from model.render import render_mesh
+    from model.Render import render_mesh
     params = dotty(params)
-    device = params['device']
+    device = params['settings.device']
 
     elevations, azimuths = zip(*product(np.arange(-30, 30.1, 30)+1, np.arange(0, 360, 5)+1))
 
@@ -242,7 +242,7 @@ def compile_video(mesh, filename, distance=3, render_mode='image_ct', ambient_ne
 
     for r, t in tqdm(list(zip(rs, ts))):
         frame = render_mesh(mesh, render_mode, r[None], t[None], params['rendering.rgb.image_size'],
-                        0.0, 1, params['device'], sigma=1e-4, gamma=1e-4, ambient_net=ambient_net)
+                        0.0, 1, params['settings.device'], sigma=1e-4, gamma=1e-4, ambient_net=ambient_net)
         if 'image' in render_mode or 'ambient' in render_mode or 'texture' in render_mode:
             frame = (frame / params['rendering.rgb.max_intensity']).clamp_max(1.0)
         elif 'normal' in render_mode:

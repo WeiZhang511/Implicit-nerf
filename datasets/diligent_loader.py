@@ -7,7 +7,7 @@ import cv2
 import trimesh
 from utils.general import P_matrix_to_rot_trans_vectors, pytorch_camera
 # from Render import render_mesh
-from model.meshes import Meshes
+from model.Meshes import Meshes
 from utils.general import save_images
 import utils.general as utils
 import utils.plots as plots
@@ -98,7 +98,7 @@ class Diligent(torch.utils.data.Dataset):
         scale = transf[0,0]
         self.Ps = torch.cat(self.Ps,dim=0) @ transf
         self.Ps[:,:3] = self.Ps[:,:3] / scale
-        
+        self.transf = transf
         
         self.lights, self.lights_int, colocated = self.get_lights()
         
