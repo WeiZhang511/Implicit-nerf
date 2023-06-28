@@ -5,11 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "run_train_deform_implicits",
             "type": "python",
+            "cwd": "${workspaceFolder}",
             "request": "launch",
-            "program": "${file}",
+            "program": "train.py",
             "console": "integratedTerminal",
+            "args": ["--conf",
+                     "conf/diligent.conf"],
             "justMyCode": true
         }
     ]

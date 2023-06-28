@@ -9,8 +9,8 @@ from skimage import measure
 import torchvision
 import trimesh
 from PIL import Image
-from pytorch3d.io import IO
-from pyntcloud import PyntCloud
+# from pytorch3d.io import IO
+# from pyntcloud import PyntCloud
 import pandas as pd
 
 def plot_images(rgb_points, ground_true, path, epoch, index=0):
@@ -71,20 +71,20 @@ def plot_mask(mask, path, epoch, index=0):
     img.save('{0}/mask_{1}_image_{2}.png'.format(path, epoch, index))
 
 
-def export_pointcloud(ptc, path, epoch, color=True):
-    if color:
-        points = ptc.points_packed().detach().cpu().numpy()
-        normals = ptc.normals_packed().detach().cpu().numpy()
-        colors = (ptc.features_packed()[...,:3].detach().cpu().numpy() * 255).astype(np.uint8)
+# def export_pointcloud(ptc, path, epoch, color=True):
+#     if color:
+#         points = ptc.points_packed().detach().cpu().numpy()
+#         normals = ptc.normals_packed().detach().cpu().numpy()
+#         colors = (ptc.features_packed()[...,:3].detach().cpu().numpy() * 255).astype(np.uint8)
         
-        cloud = PyntCloud(pd.DataFrame(
-        # same arguments that you are passing to visualize_pcl
-        data=np.hstack((points, normals, colors)),
-        columns=["x", "y", "z", "nx", "ny", "nz", "red", "green", "blue"])
-                          )
-        cloud.to_file('{0}/point_cloud_{1}.ply'.format(path, epoch))
-    else:
-        IO().save_pointcloud(ptc, '{0}/point_cloud_{1}.ply'.format(path, epoch))
+#         cloud = PyntCloud(pd.DataFrame(
+#         # same arguments that you are passing to visualize_pcl
+#         data=np.hstack((points, normals, colors)),
+#         columns=["x", "y", "z", "nx", "ny", "nz", "red", "green", "blue"])
+#                           )
+#         cloud.to_file('{0}/point_cloud_{1}.ply'.format(path, epoch))
+#     else:
+#         IO().save_pointcloud(ptc, '{0}/point_cloud_{1}.ply'.format(path, epoch))
     
 def get_3D_scatter_trace(points, name='', size=3, caption=None):
     assert points.shape[1] == 3, "3d scatter plot input points are not correctely shaped "

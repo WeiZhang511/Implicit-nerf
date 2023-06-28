@@ -88,6 +88,7 @@ class Diligent(torch.utils.data.Dataset):
             self.lights_int_path.append(light_int_path)
             self.lights_dirs_path.append(light_dirs_path)
             P, K = read_pose(self.camera_paths, view_id+1, self.device)
+            r, t = P_matrix_to_rot_trans_vectors(P)  # check for r, t
             self.Ps.append(P.expand((len(image_path),)+P.shape))
             
         # make images square
@@ -169,7 +170,8 @@ class Diligent(torch.utils.data.Dataset):
 if __name__ == '__main__':
     # import matplotlib.pyplot as plt
     
-    path_str = '/storage/group/dataset_mirrors/01_incoming/DiLiGenT-MV'
+    # path_str = '/storage/group/dataset_mirrors/01_incoming/DiLiGenT-MV'
+    path_str = '/usr/prakt/s0131/DNS/DiLiGenT-MV'
     name_str = 'reading'
     view_num = 3
     
@@ -186,7 +188,8 @@ if __name__ == '__main__':
     print(len(diligent_dataset))
     print(lights_dir.shape)
     
-    plots.save_img(sample['rgb'], '/home/wiss/sang/git/velocity_field/exps/test.png')
+    # plots.save_img(sample['rgb'], '/home/wiss/sang/git/velocity_field/exps/test.png')
+    plots.save_img(sample['rgb'], '/usr/prakt/s0131/deform_implicits/results/exps/test.png')
             
         
     

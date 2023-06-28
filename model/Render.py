@@ -30,7 +30,9 @@ def render_mesh(mesh, modes, rotations, translations, image_size, blur_radius, f
     # rasterization
     raster_settings = RasterizationSettings(
             image_size=image_size, 
-            blur_radius=min(np.log(1. / 1e-6 - 1.) * sigma, blur_radius / image_size[0] * 2), 
+            # image_size=image_size[0], 
+            # blur_radius=min(np.log(1. / 1e-6 - 1.) * sigma, blur_radius / image_size[0] * 2),
+            blur_radius=min(np.log(1. / 1e-6 - 1.) * sigma, blur_radius / image_size * 2),
             faces_per_pixel=faces_per_pixel, 
             perspective_correct= False,
         )
@@ -97,7 +99,9 @@ def render_mesh(mesh, modes, rotations, translations, image_size, blur_radius, f
         else:
             location = light_poses[i][None]# @ R
             lights = DirectionalLights(device=device, direction=location)
-        
+        # print(f'mesh: {mesh}')
+        # print(f'R[None]: {R[None]}')
+        # print(f'T[None]: {T[None]}')
         fragments = rasterizer(mesh, R=R[None], T=T[None])
         
         for j, (shader, mode) in enumerate(zip(shaders, modes)):

@@ -17,6 +17,9 @@ from datetime import datetime
 
 from torch.nn.functional import mse_loss as mse
 from model.Loss import velocity_loss, clipped_mae, chamfer_3d
+# from ./model.Loss import velocity_loss, clipped_mae, chamfer_3d
+# from usr/prakt/s0131/deform_implicits/model.Loss import velocity_loss, clipped_mae, chamfer_3d
+
 from model.Render import render_mesh
 from model.Model import MLP, PositionEncoding, ResNet, Sequential, ShapeNet, BRDFNet
 import utils.plots as plots
@@ -127,7 +130,8 @@ def train(dataset, shape_net, brdf_net, optimizer, conf,  call_back=None, init_m
                         modes='image_ct', #######
                         rotations=rotations, 
                         translations=translations, 
-                        image_size=conf['rendering.image_size'], 
+                        image_size=conf['rendering.image_size'],
+                        # image_size=conf['rendering.image_size'][0],  
                         blur_radius=conf['rendering.rgb.blur_radius'], 
                         faces_per_pixel=conf['rendering.rgb.points_per_pixel'], 
                         device=device, background_colors=None, light_poses=light_pose, materials=None, camera_settings=camera_settings,
@@ -231,6 +235,8 @@ def train(dataset, shape_net, brdf_net, optimizer, conf,  call_back=None, init_m
         
     #     if call_back is not None:
     #         call_back(mesh, losses[0])
+        # if call_back is not None:
+        #     call_back(mesh, losses[0])
 
     call_back(end=True)
     return losses
@@ -239,7 +245,7 @@ def call_back(mesh=None, loss=None, end=False):
 
     if end:
         call_back.history = []
-        call_back.video_writer.release()
+        # call_back.video_writer.release()
         call_back.video_writer = None
         return
 
@@ -251,7 +257,7 @@ def call_back(mesh=None, loss=None, end=False):
         save_models(f'{checkpoint_name}', brdf_net=brdf_net, shape_net=shape_net, 
                     optimizer=optimizer, meta=dict(loss=loss, params=dict(conf)))
     
-    with torch.no_grad():
+    with torch.no_grad():  #source code
         frame = render_mesh(mesh, 
                             modes='image_ct', #######
                             rotations=r[[0,9,40]], 
@@ -260,6 +266,15 @@ def call_back(mesh=None, loss=None, end=False):
                             blur_radius=conf['rendering.rgb.blur_radius'], 
                             faces_per_pixel=conf['rendering.rgb.faces_per_pixel'], 
                             device=device, background_colors=None, light_poses=lights[[0,9,40]], materials=None, camera_settings=camera_settings)
+    # with torch.no_grad():
+    #     frame = render_mesh(mesh, 
+    #                         modes='image_ct', #######
+    #                         rotations=r[], 
+    #                         translations=t, 
+    #                         image_size=conf['rendering.rgb.image_size'], 
+    #                         blur_radius=conf['rendering.rgb.blur_radius'], 
+    #                         faces_per_pixel=conf['rendering.rgb.faces_per_pixel'], 
+    #                         device=device, background_colors=None, light_poses=lights[[0,9,40]], materials=None, camera_settings=camera_settings)
         
         frame = torch.cat(list(f for f in frame), dim=1)
         frame = np.clip((frame * 255 / conf['rendering.rgb.max_intensity']).cpu().numpy(), 0, 255).astype(np.uint8) #######
@@ -282,6 +297,8 @@ if __name__ == '__main__':
     opt = parser.parse_args()
     conf = ConfigFactory.parse_file(opt.conf)
     device = conf.get_config('settings')['device']
+    checkpoint_name = conf.get_config('settings')['expname']
+
 
     if conf.get_config('settings')['dataset_type'] == 'diligent':
         dataset = Diligent(path_str=conf.get_config('settings')['dataset_path'],
@@ -323,7 +340,8 @@ if __name__ == '__main__':
             camera_settings_silhoutte=camera_settings_silhoutte
             )
     
-    checkpoint_name = conf['settings.expname']
+    # checkpoint_name = conf['settings.expname']
+    # checkpoint_name = conf.get_config('settings')['expname']
     load_models(f'{checkpoint_name}', brdf_net=brdf_net, shape_net=shape_net, 
                     optimizer=optimizer)
     
